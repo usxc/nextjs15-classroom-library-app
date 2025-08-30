@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { publishLoanEvent } from "@/lib/realtime";
 import { assertClassroomOrThrow } from "@/lib/ip-guard";
+import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
@@ -25,5 +26,6 @@ export async function POST(req: Request) {
   ]);
 
   await publishLoanEvent({ copyId, status: "LOANED" });
-  return Response.json({ ok: true });
+  // HTML form submit -> redirect back to /books
+  return NextResponse.redirect(new URL("/books", req.url), 303);
 }
