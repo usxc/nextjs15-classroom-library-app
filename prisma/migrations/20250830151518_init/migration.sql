@@ -57,3 +57,8 @@ ALTER TABLE "public"."Loan" ADD CONSTRAINT "Loan_copyId_fkey" FOREIGN KEY ("copy
 
 -- AddForeignKey
 ALTER TABLE "public"."Loan" ADD CONSTRAINT "Loan_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- 二重貸出防止のための部分インデックス
+create unique index if not exists ux_open_loan_per_copy
+on "Loan" ("copyId")
+where "returnedAt" is null;
