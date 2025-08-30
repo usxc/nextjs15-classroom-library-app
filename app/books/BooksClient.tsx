@@ -36,7 +36,7 @@ export default function BooksClient({
         <Sidebar tab={tab} setTab={setTab} isAdmin={isAdmin} />
         <main className="flex-1 flex flex-col">
         <section className="flex-1 overflow-auto">
-          <div className="mx-auto max-w-6xl p-4">
+          <div className="p-4">
             {tab==="list" ? (
               filtered.length === 0 ? (
                 <div className="py-20 text-center text-sm text-gray-500">一致する本が見つかりませんでした。</div>
