@@ -1,0 +1,42 @@
+// prisma/schema.prisma
+datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
+generator client { provider = "prisma-client-js" }
+
+enum UserRole { ADMIN STUDENT }
+enum CopyStatus { AVAILABLE LOANED LOST REPAIR }
+
+model User {
+  id    String   @id           // Clerkの userId をそのまま主キー
+  role  UserRole @default(STUDENT)
+  loans Loan[]
+}
+
+model Book {
+  id          String   @id @default(cuid())
+  isbn        String?
+  title       String
+  author      String?
+  publisher   String?
+  publishedAt DateTime?
+  isWithdrawn Boolean   @default(false)
+  copies      Copy[]
+}
+
+model Copy {
+  id     String     @id @default(cuid())
+  code   String     @unique           // 物理ラベル等に使う（任意）
+  status CopyStatus @default(AVAILABLE)
+  bookId String
+  book   Book       @relation(fields: [bookId], references: [id])
+  loans  Loan[]
+}
+
+model Loan {
+  id         String   @id @default(cuid())
+  copyId     String
+  copy       Copy     @relation(fields: [copyId], references: [id])
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  checkoutAt DateTime @default(now())
+  returnedAt DateTime?
+}
