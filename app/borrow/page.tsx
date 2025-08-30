@@ -12,11 +12,11 @@ export default async function BorrowPage() {
   if (!(await isClassroomRequest())) throw new Error("教室内からのみ利用できます");
 
   type CopyWithBook = {
-    id: number | string;
+    id: string;
     code: string;
     book: {
       title: string;
-      author: string;
+      author?: string | null;
     };
   };
 
