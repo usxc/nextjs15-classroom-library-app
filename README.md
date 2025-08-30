@@ -75,12 +75,14 @@ npm run dev:webpack
 初回ログイン時、Clerk の Webhook によりアプリ内ユーザー（User モデル）が作成されます。管理者（ADMIN）権限は DB で手動更新するか、管理用 UI を別途導入してください（現状は新規ユーザーは STUDENT です）。
 
 ## スクリーンショット
-```
-docs/screenshots/books.png        # 書籍一覧
-docs/screenshots/borrow.png       # 貸出画面
-docs/screenshots/return.png       # 返却画面
-docs/screenshots/admin.png        # 管理タブ（書籍/在庫）
-```
+- ホーム画面
+![books Screenshot](docs/screenshots/books.png)
+- 貸出画面
+![borrow Screenshot](docs/screenshots/borrow.png)
+- 返却画面
+![return Screenshot](docs/screenshots/return.png)
+- 管理人画面
+![admin Screenshot](docs/screenshots/admin.png)
 
 ## アーキテクチャ
 
