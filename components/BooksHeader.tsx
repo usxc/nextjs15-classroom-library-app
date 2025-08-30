@@ -27,7 +27,7 @@ export function BooksHeader({
           {classroom && (
             <>
               <a href="/borrow" className="px-3 py-2 rounded-lg bg-gray-900 text-white text-sm shadow-sm hover:bg-black transition-colors">本を借りる</a>
-              <a href="/return" className="px-3 py-2 rounded-lg border text-sm shadow-sm hover:bg-gray-50 transition-colors">返却する</a>
+              <a href="/return" className="px-3 py-2 rounded-lg border text-sm shadow-sm hover:bg-gray-50 transition-colors">本を返却する</a>
             </>
           )}
           <UserButton afterSignOutUrl="/sign-in" />
