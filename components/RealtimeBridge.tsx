@@ -8,7 +8,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
 );
 
-type LoanUpdate = Record<string, unknown>;
+type LoanUpdate = { copyId: string; status: "AVAILABLE" | "LOANED" | "LOST" | "REPAIR" };
 
 export function RealtimeBridge({ onUpdate }:{ onUpdate:(p: LoanUpdate)=>void }) {
   useEffect(() => {
