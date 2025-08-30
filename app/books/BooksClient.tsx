@@ -29,13 +29,10 @@ export default function BooksClient({
   }, [q, books]);
 
   return (
-    <div className="h-dvh flex bg-gray-50">
+    <div className="h-dvh flex flex-col bg-gray-50">
       <RealtimeBridge onUpdate={onUpdate} />
-      <Sidebar tab={tab} setTab={setTab} isAdmin={isAdmin} />
-
-      <main className="flex-1 flex flex-col">
-        <header className="h-16 sticky top-0 z-10 backdrop-blur supports-[backdrop-filter]:bg-white/70 bg-white/90 border-b">
-          <div className="h-full mx-auto max-w-6xl px-4 flex items-center gap-3">
+      <header className="h-16 sticky top-0 z-10 backdrop-blur supports-[backdrop-filter]:bg-white/70 bg-white/90 border-b">
+        <div className="h-full mx-auto max-w-6xl px-4 flex items-center gap-3">
             <h1 className="text-xl font-semibold tracking-tight">書籍</h1>
             <div className="flex-1" />
             <div className="relative">
@@ -55,9 +52,11 @@ export default function BooksClient({
               )}
               <UserButton afterSignOutUrl="/sign-in" />
             </div>
-          </div>
-        </header>
-
+        </div>
+      </header>
+      <div className="flex-1 min-h-0 flex">
+        <Sidebar tab={tab} setTab={setTab} isAdmin={isAdmin} />
+        <main className="flex-1 flex flex-col">
         <section className="flex-1 overflow-auto">
           <div className="mx-auto max-w-6xl p-4">
             {tab==="list" ? (
@@ -128,7 +127,8 @@ export default function BooksClient({
             )}
           </div>
         </section>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }
