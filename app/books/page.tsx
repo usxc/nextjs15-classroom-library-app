@@ -21,10 +21,8 @@ export default async function BooksPage() {
     orderBy: { checkoutAt: "desc" }
   });
 
-  // Serialize to Client Component friendly DTOs (no Date instances)
-  type BookWithCopies = typeof books[number];
 
-  const booksDTO = books.map((b: BookWithCopies) => ({
+  const booksDTO = books.map((b: typeof books[number]) => ({
     id: b.id,
     isbn: b.isbn,
     title: b.title,
@@ -32,12 +30,10 @@ export default async function BooksPage() {
     publisher: b.publisher,
     publishedAt: b.publishedAt ? b.publishedAt.toISOString() : null,
     isWithdrawn: b.isWithdrawn,
-    copies: b.copies.map((c: typeof b.copies[number]) => ({ id: c.id, code: c.code, status: c.status })),
+    copies: b.copies.map((c: { id: string; code: string; status: string }) => ({ id: c.id, code: c.code, status: c.status })),
   }));
 
-  type MyLoan = typeof myLoans[number];
-
-  const myLoansDTO = myLoans.map((l: MyLoan) => ({
+  const myLoansDTO = myLoans.map((l: typeof myLoans[number]) => ({
     id: l.id,
     checkoutAt: l.checkoutAt.toISOString(),
     returnedAt: l.returnedAt ? l.returnedAt.toISOString() : null,
