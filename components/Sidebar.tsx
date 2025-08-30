@@ -1,7 +1,7 @@
 "use client";
 export default function Sidebar({
   tab, setTab, isAdmin,
-}:{ tab:"list"|"mine"|"add"|"delete"; setTab:(t:"list"|"mine"|"add"|"delete")=>void; isAdmin?:boolean }) {
+}:{ tab:"list"|"mine"|"add"|"delete"|"stock"; setTab:(t:"list"|"mine"|"add"|"delete"|"stock")=>void; isAdmin?:boolean }) {
   return (
     <aside className="w-64 border-r h-full p-4 bg-white/70">
       <nav className="space-y-1">
@@ -23,6 +23,10 @@ export default function Sidebar({
             <button onClick={()=>setTab("delete")}
               className={`w-full text-left px-3 py-2 rounded ${tab==="delete"?"bg-gray-900 text-white":"hover:bg-gray-100"}`}>
               本を削除
+            </button>
+            <button onClick={()=>setTab("stock")}
+              className={`w-full text-left px-3 py-2 rounded ${tab==="stock"?"bg-gray-900 text-white":"hover:bg-gray-100"}`}>
+              在庫管理
             </button>
           </div>
         )}
