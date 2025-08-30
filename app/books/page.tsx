@@ -46,5 +46,13 @@ export default async function BooksPage() {
   }));
 
   const classroom = await isClassroomRequest();
-  return <BooksClient initialBooks={booksDTO} initialMyLoans={myLoansDTO} classroom={classroom} />;
+  const isAdmin = me.role === "ADMIN";
+  return (
+    <BooksClient
+      initialBooks={booksDTO}
+      initialMyLoans={myLoansDTO}
+      classroom={classroom}
+      isAdmin={isAdmin}
+    />
+  );
 }
