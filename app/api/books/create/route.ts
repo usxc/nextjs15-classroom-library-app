@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { z } from "zod";
+import { randomUUID } from "crypto";
 
 export const runtime = "nodejs";
 
@@ -37,6 +38,13 @@ export async function POST(req: Request) {
       publisher: publisher ?? null,
       publishedAt: publishedAt ? new Date(publishedAt) : null,
       isWithdrawn: false,
+      copies: {
+        create: [
+          {
+            code: `CP-${randomUUID().slice(0, 8).toUpperCase()}`,
+          },
+        ],
+      },
     },
     include: { copies: { select: { id: true, code: true, status: true } } },
   });
