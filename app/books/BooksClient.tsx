@@ -2,10 +2,35 @@
 import { useState } from "react";
 import Sidebar from "@/components/Sidebar";
 
-export default function BooksClient() {
+type CopyDTO = { id: string; code: string; status: "AVAILABLE"|"LOANED"|"LOST"|"REPAIR" };
+type BookWithCopiesDTO = {
+  id: string;
+  isbn: string | null;
+  title: string;
+  author: string | null;
+  publisher: string | null;
+  publishedAt: string | null;
+  isWithdrawn: boolean;
+  copies: CopyDTO[];
+};
+type LoanWithCopyAndBookDTO = {
+  id: string;
+  checkoutAt: string;
+  returnedAt: string | null;
+  copy: { id: string; book: { id: string; title: string; author: string | null } };
+};
+
+export default function BooksClient({
+  initialBooks,
+  initialMyLoans,
+  classroom,
+}: {
+  initialBooks: BookWithCopiesDTO[];
+  initialMyLoans: LoanWithCopyAndBookDTO[];
+  classroom: boolean;
+}) {
   const [tab, setTab] = useState<"list"|"mine">("list");
   const [q, setQ] = useState("");
-  const classroom = false; // 後でSSRから注入
 
   return (
     <div className="h-dvh flex">
@@ -32,7 +57,7 @@ export default function BooksClient() {
           </div>
         </header>
         <section className="flex-1 overflow-auto p-4">
-          {tab==="list" ? <p>（ここに本のリスト）</p> : <p>（ここに自分の貸出）</p>}
+          {tab==="list" ? <p>（ここに本のリスト） {initialBooks.length} 冊</p> : <p>（ここに自分の貸出） {initialMyLoans.length} 件</p>}
         </section>
       </main>
     </div>
