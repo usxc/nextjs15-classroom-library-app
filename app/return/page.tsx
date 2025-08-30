@@ -17,7 +17,7 @@ export default async function ReturnPage() {
       id: string;
       book: {
         title: string;
-        author: string;
+        author?: string | null;
       };
     };
   };
