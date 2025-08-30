@@ -85,17 +85,17 @@ flowchart LR
     UI[Books UI]
   end
 
-  UI -- HTTP(S) --> Next[Next.js (App Router)]
-  Next -- Prisma --> DB[(PostgreSQL)]
-  Next -- Clerk SDK --> Clerk[Clerk]
-  Clerk -- Svix Webhook --> Webhook[/api/webhooks/clerk]
-  Next -- Supabase Client --> Realtime[(Supabase Realtime)]
+  UI -->|HTTPS| NEXT[Next.js App Router]
+  NEXT -->|Prisma| DB[(PostgreSQL)]
+  NEXT -->|Clerk SDK| CLERK[Clerk]
+  CLERK -->|Svix Webhook| WEBHOOK[API /api/webhooks/clerk]
+  NEXT -->|Supabase Client| RT[(Supabase Realtime)]
 
   subgraph RealtimeBroadcast
     BR[library channel: loan:update]
   end
 
-  Next <-. publishLoanEvent .-> BR
+  NEXT -. publishLoanEvent .-> BR
   BR -. push .-> UI
 ```
 
@@ -109,7 +109,7 @@ erDiagram
 
   USER {
     string id PK
-    enum role "ADMIN|STUDENT"
+    string role
   }
   BOOK {
     string id PK
@@ -117,21 +117,21 @@ erDiagram
     string title
     string author
     string publisher
-    datetime publishedAt
+    string publishedAt
     boolean isWithdrawn
   }
   COPY {
     string id PK
-    string code UNIQUE
-    enum status "AVAILABLE|LOANED|LOST|REPAIR"
+    string code UK
+    string status
     string bookId FK
   }
   LOAN {
     string id PK
     string copyId FK
     string userId FK
-    datetime checkoutAt
-    datetime returnedAt
+    string checkoutAt
+    string returnedAt
   }
 ```
 
