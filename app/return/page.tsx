@@ -30,7 +30,7 @@ export default async function ReturnPage() {
 
   return (
     <div className="p-6 space-y-4">
-      <h1 className="text-2xl font-bold">返却する</h1>
+      <h1 className="text-2xl font-bold">本を返却する</h1>
       {loans.length===0 ? <p>現在、返却できる本はありません。</p> : (
         <ul className="space-y-3">
           {loans.map((l: Loan) => (
