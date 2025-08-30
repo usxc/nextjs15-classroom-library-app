@@ -12,7 +12,7 @@ export default function BooksClient({
   initialBooks, initialMyLoans, classroom, isAdmin
 }:{ initialBooks:Book[]; initialMyLoans:Loan[]; classroom:boolean; isAdmin:boolean }) {
 
-  const [tab, setTab] = useState<"list"|"mine"|"add"|"delete">("list");
+  const [tab, setTab] = useState<"list"|"mine"|"add"|"delete"|"stock">("list");
   const [books, setBooks] = useState<Book[]>(initialBooks);
   const [myLoans, setMyLoans] = useState<Loan[]>(initialMyLoans);
   const [q, setQ] = useState("");
@@ -113,8 +113,18 @@ export default function BooksClient({
               </div>
             ) : tab==="add" ? (
               <AdminAddBook onCreated={(b)=>setBooks(prev=>[b, ...prev])} />
-            ) : (
+            ) : tab==="delete" ? (
               <AdminDeleteBook books={books} onDeleted={(id)=>setBooks(prev=>prev.filter(b=>b.id!==id))} />
+            ) : (
+              <AdminStockManager
+                books={books}
+                onAdded={(bookId, copies)=>{
+                  setBooks(prev=>prev.map(b=> b.id===bookId ? {...b, copies:[...b.copies, ...copies]} : b));
+                }}
+                onRetired={(bookId, copyId)=>{
+                  setBooks(prev=>prev.map(b=> b.id===bookId ? {...b, copies:b.copies.map(c=> c.id===copyId?{...c, status:"LOST"}:c)} : b));
+                }}
+              />
             )}
           </div>
         </section>
@@ -231,6 +241,86 @@ function AdminDeleteBook({ books, onDeleted }:{ books:Book[]; onDeleted:(id:stri
       </form>
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
       <p className="mt-2 text-xs text-gray-500">削除は一覧から非表示にする処理（Withdraw）です。関連する貸出履歴は保持されます。</p>
+    </div>
+  );
+}
+
+function AdminStockManager({ books, onAdded, onRetired }:{
+  books: Book[];
+  onAdded: (bookId:string, copies: Book["copies"])=>void;
+  onRetired: (bookId:string, copyId:string)=>void;
+}){
+  const [selected, setSelected] = useState<string>(books[0]?.id ?? "");
+  const [count, setCount] = useState<number>(1);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string|undefined>();
+
+  const book = books.find(b=>b.id===selected);
+
+  const addCopies = async () => {
+    if (!selected || count<1) return;
+    setBusy(true); setError(undefined);
+    try{
+      const res = await fetch("/api/copies/create", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ bookId: selected, count }) });
+      if (!res.ok) throw new Error("追加に失敗しました");
+      const data: { copies: { id:string; code:string; status: Book["copies"][number]["status"] }[] } = await res.json();
+      onAdded(selected, data.copies);
+    }catch(err: unknown){
+      setError(err instanceof Error ? err.message : String(err));
+    }finally{ setBusy(false); }
+  };
+
+  const retireCopy = async (copyId: string) => {
+    setBusy(true); setError(undefined);
+    try{
+      const res = await fetch("/api/copies/retire", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ copyId }) });
+      if (!res.ok){
+        const j = await res.json().catch(()=>({error:""}));
+        throw new Error(j.error || "処理に失敗しました");
+      }
+      onRetired(selected, copyId);
+    }catch(err: unknown){
+      setError(err instanceof Error ? err.message : String(err));
+    }finally{ setBusy(false); }
+  };
+
+  return (
+    <div className="space-y-4">
+      <h2 className="text-sm font-medium text-gray-600">在庫管理</h2>
+      <div className="flex flex-wrap items-end gap-3">
+        <div>
+          <label className="block text-xs text-gray-600 mb-1">対象の本</label>
+          <select value={selected} onChange={e=>setSelected(e.target.value)} className="w-72 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-300">
+            {books.map(b=> (<option key={b.id} value={b.id}>{b.title}{b.author?` / ${b.author}`:""}</option>))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs text-gray-600 mb-1">追加数</label>
+          <input type="number" min={1} max={20} value={count} onChange={e=>setCount(Number(e.target.value))} className="w-28 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-300" />
+        </div>
+        <button onClick={addCopies} disabled={busy || !selected || count<1} className="px-3 py-2 rounded-lg bg-gray-900 text-white text-sm shadow-sm hover:bg-black transition-colors disabled:opacity-60">在庫を追加</button>
+      </div>
+      {error && <p className="text-sm text-red-600">{error}</p>}
+      <div className="mt-2">
+        <div className="text-xs text-gray-500 mb-2">現在の在庫</div>
+        {book ? (
+          <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {book.copies.map(c=> (
+              <li key={c.id} className="flex items-center justify-between rounded-lg border bg-white px-3 py-2 text-sm">
+                <span className="flex items-center gap-2">
+                  <code className="rounded bg-gray-50 px-2 py-0.5 text-[11px] ring-1 ring-inset ring-gray-200">{c.code}</code>
+                  <StatusBadge status={c.status} />
+                </span>
+                <div className="flex items-center gap-2">
+                  <button onClick={()=>retireCopy(c.id)} disabled={busy || c.status!=="AVAILABLE"} className="px-2 py-1 rounded border text-xs hover:bg-gray-50 disabled:opacity-60">無効化</button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-gray-500">本がありません。</p>
+        )}
+      </div>
     </div>
   );
 }
