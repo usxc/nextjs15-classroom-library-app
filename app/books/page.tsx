@@ -4,6 +4,7 @@ import { getOrCreateAppUser } from "@/lib/appUser";
 import BooksClient from "./BooksClient";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export default async function BooksPage() {
   const me = await getOrCreateAppUser(); // ← Webhook失敗時の保険
@@ -30,7 +31,11 @@ export default async function BooksPage() {
     publisher: b.publisher,
     publishedAt: b.publishedAt ? b.publishedAt.toISOString() : null,
     isWithdrawn: b.isWithdrawn,
-    copies: b.copies.map((c: { id: string; code: string; status: string }) => ({ id: c.id, code: c.code, status: c.status })),
+    copies: b.copies.map((c: { id: string; code: string; status: string }) => ({
+      id: c.id,
+      code: c.code,
+      status: c.status as "AVAILABLE"|"LOANED"|"LOST"|"REPAIR",
+    })),
   }));
 
   const myLoansDTO = myLoans.map((l: typeof myLoans[number]) => ({
