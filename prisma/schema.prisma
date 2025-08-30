@@ -1,9 +1,24 @@
 // prisma/schema.prisma
-datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
-generator client { provider = "prisma-client-js" }
+generator client {
+  provider = "prisma-client-js"
+}
 
-enum UserRole { ADMIN STUDENT }
-enum CopyStatus { AVAILABLE LOANED LOST REPAIR }
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  STUDENT
+}
+
+enum CopyStatus {
+  AVAILABLE
+  LOANED
+  LOST
+  REPAIR
+}
 
 model User {
   id    String   @id           // Clerkの userId をそのまま主キー
