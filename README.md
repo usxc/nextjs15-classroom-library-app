@@ -149,11 +149,41 @@ flowchart LR
   CLERK -->|Svix Webhook| WEBHOOK[API /api/webhooks/clerk]
   NEXT -->|Supabase Client| RT[(Supabase Realtime)]
 
+  %% 主要API/Actions
+  subgraph NextAPI
+    LOAN_CHECKOUT[POST /api/loans/checkout]
+    LOAN_RETURN[POST /api/loans/return]
+    BOOK_CREATE[POST /api/books/create]
+    BOOK_WITHDRAW[POST /api/books/withdraw]
+    COPY_CREATE[POST /api/copies/create]
+    COPY_RETIRE[POST /api/copies/retire]
+  end
+
+  %% Realtime（Broadcast）
   subgraph RealtimeBroadcast
     BR[library channel: loan:update]
   end
 
-  NEXT -. publishLoanEvent .-> BR
+  %% Browser → Next の操作
+  UI -->|borrow| LOAN_CHECKOUT
+  UI -->|return| LOAN_RETURN
+  UI -->|admin add| BOOK_CREATE
+  UI -->|admin withdraw| BOOK_WITHDRAW
+  UI -->|admin add copies| COPY_CREATE
+  UI -->|admin retire copy| COPY_RETIRE
+
+  %% DB 書き込み
+  LOAN_CHECKOUT -->|Prisma| DB
+  LOAN_RETURN -->|Prisma| DB
+  BOOK_CREATE -->|Prisma| DB
+  BOOK_WITHDRAW -->|Prisma| DB
+  COPY_CREATE -->|Prisma| DB
+  COPY_RETIRE -->|Prisma| DB
+  WEBHOOK -->|Prisma| DB
+
+  %% Realtime: サーバ→チャンネル→UI
+  LOAN_CHECKOUT -. publishLoanEvent .-> BR
+  LOAN_RETURN -. publishLoanEvent .-> BR
   BR -. push .-> UI
 ```
 
