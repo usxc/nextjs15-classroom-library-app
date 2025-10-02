@@ -111,15 +111,15 @@ npm run dev:webpack
 ## 運用手順(Ops)
 
 - 初期セットアップ
-  - 環境変数を`.env.local`に設定
+  - 環境変数を`.env.local`に設定。
   - `npm install && npm run prisma:generate && npm run prisma:migrate`
 
 - 本番ビルド/起動
   - `npm run build:webpack` → `npm run start`
-  - 逆プロキシの背後で動かす場合は`x-forwarded-for` / `x-real-ip`が渡るよう設定
+  - 逆プロキシの背後で動かす場合は`x-forwarded-for` / `x-real-ip`が渡るよう設定。
 
 - 管理者権限の付与
-  - Prisma Studio: `npx prisma studio`で`User.role`を`ADMIN`に変更
+  - Prisma Studio: `npx prisma studio`で`User.role`を`ADMIN`に変更。
   - もしくは SQL: `update "User" set role='ADMIN' where id='<clerk_user_id>';`
 
 - データバックアップ/リストア（例: Supabase/PostgreSQL）
@@ -127,12 +127,12 @@ npm run dev:webpack
   - リストア: `psql "$DATABASE_URL" < backup.sql`
 
 - シークレットローテーション
-  - ClerkのPublishable/Secret、Webhook Secretを更新→再デプロイ
-  - Supabaseの鍵を更新した場合も同様
+  - ClerkのPublishable/Secret、Webhook Secretを更新→再デプロイ。
+  - Supabaseの鍵を更新した場合も同様。
 
 - 監視/ログ
-  - アプリログ: Next.jsサーバープロセスの標準出力
-  - Webhook 失敗時: Clerkダッシュボードで確認
+  - アプリログ: Next.jsサーバープロセスの標準出力。
+  - Webhook 失敗時: Clerkダッシュボードで確認。
 
 ## アーキテクチャ
 
