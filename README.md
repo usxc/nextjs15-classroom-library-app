@@ -1,28 +1,66 @@
 ## Classroom Library App (Next.js)
 
-教室向けの書籍貸出 Web アプリです。Clerk による認証、Supabase Realtime による在庫更新、Prisma + PostgreSQL によるデータ永続化を採用しています。学生は書籍の閲覧・検索・貸出/返却ができ、管理者は書籍・在庫の管理を行えます。
+教室向けの書籍管理・貸出・返却Webアプリケーションです。Clerkによる認証、Supabase Realtimeによる在庫更新、Prisma, PostgreSQL(Supabase Database)によるデータ永続化を採用しています。学生は書籍の閲覧・検索・貸出・返却ができ、管理者は書籍・在庫の管理を行えます。
+
+## 開発の経緯
+
+教室には、学生なら誰でも貸し借りできる書籍が多数ありました。
+しかし、貸し出しが進むにつれて、貸出者や貸出中の書籍が分からなくなるという問題が教室内で生じていました。
+こうした課題をきっかけに、誰が・いつ・どの本を借りて返したのかを記録/可視化すれば、貸出状況の透明性が高まり、これらの課題を解決できるのではないかと考え開発しました。
 
 ## 主な機能
 
-- 認証: Clerk でログイン/ログアウト、Webhook でユーザー作成時にアプリ内ユーザーを自動作成
-- 書籍一覧: タイトル/著者検索、在庫バッジ表示、貸出状況のリアルタイム反映
-- 貸出/返却: 教室内 IP のみ許可（フォーム送信後は /books にリダイレクト）
-- 管理機能: 書籍の追加・削除(Withdraw)、在庫の追加・無効化(LOST)
-- リアルタイム更新: Supabase Broadcast チャンネルで在庫ステータスを即時反映
+- 認証: Clerkでログイン/ログアウト、Webhookでユーザー作成時にアプリ内ユーザーを自動作成。
+- 書籍一覧: タイトル/著者検索、在庫バッジ表示、貸出状況のリアルタイム反映。
+- 貸出/返却: 教室内IPのみ許可(フォーム送信後は /books にリダイレクト)。
+- 管理機能: 書籍の追加・削除(Withdraw)、在庫の追加・無効化(LOST)。
+- リアルタイム更新: Supabase Broadcastチャンネルで在庫ステータスを即時反映。
 
-## 技術スタック
+## 主要な画面
 
-- Next.js 15 / React 19（App Router）
-- TypeScript / Tailwind CSS v4（PostCSS）
-- Prisma / PostgreSQL（Supabase でホスティング）
-- Clerk（認証）/ Svix（Webhook 署名検証）
-- Supabase Realtime（broadcast チャンネル）
+- `/books`: 書籍一覧(検索、在庫表示、管理タブ)
+- `/borrow`: 貸出(教室IPのみ)
+- `/return`: 返却(教室IPのみ)
+- `/sign-in`: サインイン
+
+※ 管理タブはADMINのみ表示され、書籍の追加/削除(Withdraw)、在庫の追加/無効化が可能です。
+
+## スクリーンショット
+- ホーム画面
+![books Screenshot](docs/screenshots/books.png)
+- 貸出画面
+![borrow Screenshot](docs/screenshots/borrow.png)
+- 返却画面
+![return Screenshot](docs/screenshots/return.png)
+- 管理人画面
+![admin Screenshot](docs/screenshots/admin.png)
+
+## 使用技術
+
+### フロントエンド
+
+- 言語: TypeScript
+- フレームワーク: Next.js 15.5(App Router)
+- スタイル: tailwind
+
+### バックエンド
+
+- 言語: TypeScript
+- フレームワーク: Next.js 15.5(App Router)
+- データベース: PostgreSQL(Supabase Database)
+- ORM: Prisma
+- 認証: Clerk
+- ストレージ: Supabase Storage
+
+### 開発環境・インフラ
+- IDE: Visual Studio Code
+- バージョン管理: Git, GitHub
 
 ## 必要要件
 
-- Node.js 18+（推奨 20+）
-- PostgreSQL 接続先（例: Supabase）
-- Clerk プロジェクト（Publishable/Secret Key、Webhook Secret）
+- Node.js 18+(推奨 20+)
+- PostgreSQL 接続先(例: Supabase)
+- Clerk プロジェクト(Publishable/Secret Key、Webhook Secret)
 
 ## 環境変数 (.env.local)
 
@@ -39,15 +77,12 @@ DATABASE_URL=postgresql://...
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=...
 CLERK_SECRET_KEY=...
 
-# 教室IP 制御（カンマ区切り / プレフィックスは末尾にドット）
+# 教室IP制御(カンマ区切り / プレフィックスは末尾にドット)
 CLASSROOM_ALLOWED_IPS=""  # 例: "203.0.113.,198.51.100.42"
 
 # Clerk Webhook
 CLERK_WEBHOOK_SECRET=...
 ```
-
-メモ:
-- `CLASSROOM_ALLOWED_IPS` が空の場合は制限なし（開発用）。`203.0.113.` のように末尾 `.` を付けるとプレフィックス一致扱いになります。
 
 ## セットアップ
 
@@ -64,25 +99,41 @@ npm run prisma:generate
 npm run prisma:migrate
 ```
 
-3) 開発サーバーの起動（Webpack 推奨）
+3) 開発サーバーの起動(Webpack 推奨)
 
 ```
 npm run dev:webpack
 ```
 
-4) アプリを開く → http://localhost:3000
+4) サーバー起動後、http://localhost:3000 でアプリにアクセスできます。
 
-初回ログイン時、Clerk の Webhook によりアプリ内ユーザー（User モデル）が作成されます。管理者（ADMIN）権限は DB で手動更新するか、管理用 UI を別途導入してください（現状は新規ユーザーは STUDENT です）。
+※ 初回ログイン時、ClerkのWebhookによりアプリ内ユーザー(Userモデル)が作成されます。管理者(ADMIN)権限はDBで手動更新するか、管理用UIを別途導入してください(現状は新規ユーザーはSTUDENTです)。
 
-## スクリーンショット
-- ホーム画面
-![books Screenshot](docs/screenshots/books.png)
-- 貸出画面
-![borrow Screenshot](docs/screenshots/borrow.png)
-- 返却画面
-![return Screenshot](docs/screenshots/return.png)
-- 管理人画面
-![admin Screenshot](docs/screenshots/admin.png)
+## 運用手順(Ops)
+
+- 初期セットアップ
+  - 環境変数を`.env.local`に設定
+  - `npm install && npm run prisma:generate && npm run prisma:migrate`
+
+- 本番ビルド/起動
+  - `npm run build:webpack` → `npm run start`
+  - 逆プロキシの背後で動かす場合は`x-forwarded-for` / `x-real-ip`が渡るよう設定
+
+- 管理者権限の付与
+  - Prisma Studio: `npx prisma studio`で`User.role`を`ADMIN`に変更
+  - もしくは SQL: `update "User" set role='ADMIN' where id='<clerk_user_id>';`
+
+- データバックアップ/リストア（例: Supabase/PostgreSQL）
+  - バックアップ: `pg_dump "$DATABASE_URL" > backup.sql`
+  - リストア: `psql "$DATABASE_URL" < backup.sql`
+
+- シークレットローテーション
+  - ClerkのPublishable/Secret、Webhook Secretを更新→再デプロイ
+  - Supabaseの鍵を更新した場合も同様
+
+- 監視/ログ
+  - アプリログ: Next.jsサーバープロセスの標準出力
+  - Webhook 失敗時: Clerkダッシュボードで確認
 
 ## アーキテクチャ
 
@@ -106,7 +157,7 @@ flowchart LR
   BR -. push .-> UI
 ```
 
-## ER 図（論理）
+## ER図
 
 ```mermaid
 erDiagram
@@ -142,70 +193,43 @@ erDiagram
   }
 ```
 
-## 運用手順（Ops）
+## 開発にあたって工夫した点
+- ユーザー同期 
+Clerk Webhookを使用して、ユーザーが作成されたときに、自動でDBにユーザーが保存されるようにしました。また、Svix検証を行うように実装し、正しいリクエストのみ受けとるようにしました。
 
-- 初期セットアップ
-  - 環境変数を `.env.local`（本番は安全な手段で）に設定
-  - `npm install && npm run prisma:generate && npm run prisma:migrate`
+- 教室内限定の貸出・返却
+貸出・返却は特定のipに接続した場合のみに許可し、教室内にいる時だけ貸出・返却を行えるようにしました。この工夫ににより、より確実に書籍の貸出・返却が行われるようになりました。
 
-- 本番ビルド/起動
-  - `npm run build:webpack` → `npm run start`
-  - 逆プロキシの背後で動かす場合は `x-forwarded-for` / `x-real-ip` が渡るよう設定
+- DB設計の見直し
+当初のDB設計では、同一の書籍を複数回貸出することができませんでした。しかしこれを、ユーザーIDと書籍IDの複合キーを貸出テーブルに設定することで解決しました。
 
-- 管理者権限の付与
-  - Prisma Studio: `npx prisma studio` で `User.role` を `ADMIN` に変更
-  - もしくは SQL: `update "User" set role='ADMIN' where id='<clerk_user_id>';`
+- 二重貸出の防止
+2人がほぼ同時に貸出ボタンを押すと、二重貸出ができてしまう課題がありました。しかしこれを、未返却の書籍IDにユニークなインデックスを割り当てることにより解決しました。
 
-- データバックアップ/リストア（例: Supabase/PostgreSQL）
-  - バックアップ: `pg_dump "$DATABASE_URL" > backup.sql`
-  - リストア: `psql "$DATABASE_URL" < backup.sql`
+- リアルタイム反映
+貸出・返却の完了後に、libraryチャンネルでloan:updateイベントをbroadcast(例：{ copyId, status })します。
+ブラウザ側はRealtimeBridgeで購読し、在庫バッジや「自分の貸出」リストを即時更新します。ポーリングなしで最新状態を共有できます。
 
-- シークレットローテーション
-  - Clerk の Publishable/Secret、Webhook Secret を更新→再デプロイ
-  - Supabase の鍵を更新した場合も同様
+## 今後の展望
 
-- 監視/ログ
-  - アプリログ: Next.js サーバープロセスの標準出力
-  - Webhook 失敗時: Clerk ダッシュボードで確認
+今後の展望アイデアは以下の通りです。
 
-## 主要な画面
+1. 登録・在庫管理の効率化
+    - バーコード/QRで書籍登録。
 
-- `/books`: 書籍一覧（検索、在庫表示、管理タブ）
-- `/borrow`: 貸出（教室 IP のみ）
-- `/return`: 返却（教室 IP のみ）
-- `/sign-in`: サインイン
+2. 貸出・返却体験の向上
+    - バーコードで貸出・返却。
+    - 教室入口のタブレット専用画面からの貸出・返却(キオスクモード)。
+    - 予約・取り置き機能。
+    - 同時貸出上限、貸出延長回数などのポリシー化。
 
-管理タブは ADMIN のみ表示され、書籍の追加/削除（Withdraw）、在庫の追加/無効化が可能です。
+3. 通知・リマインド
+    - 返却期限(前日/当日/超過時の通知)を通知。
 
-## API 一覧（抜粋）
+4. 可視化・分析
+    - 貸出人気ランキングの追加。
+    - 貸出数、返却率、ピーク時間などをカード表示。
 
-- POST `/api/loans/checkout`（教室 IP のみ）
-  - フォーム: `copyId`
-  - 成功時: `303` で `/books` にリダイレクト
-
-- POST `/api/loans/return`（教室 IP のみ）
-  - フォーム: `loanId`
-  - 成功時: `303` で `/books` にリダイレクト
-
-- POST `/api/books/create`（ADMIN）
-  - JSON: `{ title, author?, isbn?, publisher?, publishedAt? }`
-  - 初期在庫を 1 件自動作成します
-
-- POST `/api/books/withdraw`（ADMIN）
-  - JSON: `{ bookId }`
-  - 書籍を一覧から非表示（履歴は保持）
-
-- POST `/api/copies/create`（ADMIN）
-  - JSON: `{ bookId, count?=1 }`（1〜20）
-  - 指定冊数の在庫を追加
-
-- POST `/api/copies/retire`（ADMIN）
-  - JSON: `{ copyId }`
-  - 未貸出の在庫を `LOST` に変更（在庫から除外）
-
-- POST `/api/webhooks/clerk`（Clerk Webhook）
-  - Svix 署名検証後、`user.created` イベントでアプリ内ユーザーを upsert
-
-## ライセンス
-
-MIT License
+5. 連携・拡張
+    - 書籍を借りた人のGoogle Calendarに返却期限を自動登録。
+    - Slack/Teamsへ返却期限・入荷情報を投稿。
