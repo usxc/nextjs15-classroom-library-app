@@ -1,4 +1,4 @@
-## Classroom Library App (Next.js)
+## Classroom Library App
 
 教室向けの書籍管理・貸出・返却Webアプリケーションです。Clerkによる認証、Supabase Realtimeによる在庫更新、Prisma, PostgreSQL(Supabase Database)によるデータ永続化を採用しています。学生は書籍の閲覧・検索・貸出・返却ができ、管理者は書籍・在庫の管理を行えます。
 
