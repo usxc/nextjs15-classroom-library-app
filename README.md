@@ -50,7 +50,6 @@
 - データベース: PostgreSQL(Supabase Database)
 - ORM: Prisma
 - 認証: Clerk
-- ストレージ: Supabase Storage
 
 ### 開発環境・インフラ
 - IDE: Visual Studio Code
