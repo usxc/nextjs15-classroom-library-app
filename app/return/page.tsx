@@ -1,7 +1,6 @@
 // app/return/page.tsx
 import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { isClassroomRequest } from "@/lib/classroom";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -9,7 +8,6 @@ export const runtime = "nodejs";
 export default async function ReturnPage() {
   const { userId } = await auth();
   if (!userId) throw new Error("ログインしてください");
-  if (!(await isClassroomRequest())) throw new Error("教室内からのみ利用できます");
 
   type Loan = {
     id: string;
