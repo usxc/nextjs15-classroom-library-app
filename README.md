@@ -10,15 +10,15 @@
 
 - 認証: Clerkでログイン/ログアウト、Webhookでユーザー作成時にアプリ内ユーザーを自動作成。
 - 書籍一覧: タイトル/著者検索、在庫バッジ表示、貸出状況のリアルタイム反映。
-- 貸出/返却: 教室内IPのみ許可(フォーム送信後は /books にリダイレクト)。
+- 貸出/返却: フォーム送信後は /books にリダイレクト。
 - 管理機能: 書籍の追加・削除(Withdraw)、在庫の追加・無効化(LOST)。
 - リアルタイム更新: Supabase Broadcastチャンネルで在庫ステータスを即時反映。
 
 ## 主要な画面
 
 - `/books`: 書籍一覧(検索、在庫表示、管理タブ)
-- `/borrow`: 貸出(教室IPのみ)
-- `/return`: 返却(教室IPのみ)
+- `/borrow`: 貸出
+- `/return`: 返却
 - `/sign-in`: サインイン
 
 ※ 管理タブはADMINのみ表示され、書籍の追加/削除(Withdraw)、在庫の追加/無効化が可能です。
@@ -74,9 +74,6 @@ DATABASE_URL=postgresql://...
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=...
 CLERK_SECRET_KEY=...
 
-# 教室IP制御(カンマ区切り / プレフィックスは末尾にドット)
-CLASSROOM_ALLOWED_IPS=""  # 例: "203.0.113.,198.51.100.42"
-
 # Clerk Webhook
 CLERK_WEBHOOK_SECRET=...
 ```
@@ -114,7 +111,6 @@ npm run dev:webpack
 
 - 本番ビルド/起動
   - `npm run build:webpack` → `npm run start`
-  - 逆プロキシの背後で動かす場合は`x-forwarded-for` / `x-real-ip`が渡るよう設定。
 
 - 管理者権限の付与
   - Prisma Studio: `npx prisma studio`で`User.role`を`ADMIN`に変更。
@@ -223,9 +219,6 @@ erDiagram
 ## 開発にあたって工夫した点
 - ユーザー同期  
   Clerk Webhookを使用して、ユーザーが作成されたときに、自動でDBにユーザーが保存されるようにしました。また、Svix検証を行うように実装し、正しいリクエストのみ受けとるようにしました。
-
-- 教室内限定の貸出・返却  
-  貸出・返却は特定のipに接続した場合のみに許可し、教室内にいる時だけ貸出・返却を行えるようにしました。この工夫ににより、より確実に書籍の貸出・返却が行われるようになりました。
 
 - DB設計の見直し  
   当初のDB設計では、同一の書籍を複数回貸出することができませんでした。しかしこれを、書籍情報(Book)と物理的な冊子(Copy)を分離し、さらに貸出ごとに一意なIDを持つLoanテーブルを導入することによって解決しました。
