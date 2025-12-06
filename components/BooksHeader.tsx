@@ -4,11 +4,9 @@ import { UserButton } from "@clerk/nextjs";
 export function BooksHeader({
   q,
   onSearchChange,
-  classroom,
 }:{
   q: string;
   onSearchChange: (value: string) => void;
-  classroom: boolean;
 }) {
   return (
     <header className="h-16 sticky top-0 z-10 border-b bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/70">
@@ -33,12 +31,8 @@ export function BooksHeader({
 
         {/* Actions: Borrow/Return */}
         <div className="flex items-center gap-2">
-          {classroom && (
-            <>
-              <a href="/borrow" className="px-3 py-2 rounded-lg bg-gray-900 text-white text-sm shadow-sm hover:bg-black transition-colors">本を借りる</a>
-              <a href="/return" className="px-3 py-2 rounded-lg border text-sm shadow-sm hover:bg-gray-50 transition-colors">本を返却する</a>
-            </>
-          )}
+          <a href="/borrow" className="px-3 py-2 rounded-lg bg-gray-900 text-white text-sm shadow-sm hover:bg-black transition-colors">本を借りる</a>
+          <a href="/return" className="px-3 py-2 rounded-lg border text-sm shadow-sm hover:bg-gray-50 transition-colors">本を返却する</a>
         </div>
 
         {/* Rightmost: User icon */}
