@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { isClassroomRequest } from "@/lib/classroom";
 import { getOrCreateAppUser } from "@/lib/appUser";
 import BooksClient from "./BooksClient";
 
@@ -45,13 +44,11 @@ export default async function BooksPage() {
     copy: { id: l.copy.id, book: { id: l.copy.book.id, title: l.copy.book.title, author: l.copy.book.author } },
   }));
 
-  const classroom = await isClassroomRequest();
   const isAdmin = me.role === "ADMIN";
   return (
     <BooksClient
       initialBooks={booksDTO}
       initialMyLoans={myLoansDTO}
-      classroom={classroom}
       isAdmin={isAdmin}
     />
   );
