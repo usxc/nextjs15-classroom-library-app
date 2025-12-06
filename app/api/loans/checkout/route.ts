@@ -2,14 +2,11 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { publishLoanEvent } from "@/lib/realtime";
-import { assertClassroomOrThrow } from "@/lib/ip-guard";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
-  await assertClassroomOrThrow();
-
   const { userId } = await auth();
   if (!userId) return new Response("Unauthorized", { status: 401 });
 
