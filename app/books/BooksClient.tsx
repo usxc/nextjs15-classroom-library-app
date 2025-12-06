@@ -25,12 +25,10 @@ type Loan = {
 export default function BooksClient({
   initialBooks,
   initialMyLoans,
-  classroom,
   isAdmin,
 }: {
   initialBooks: Book[];
   initialMyLoans: Loan[];
-  classroom: boolean;
   isAdmin: boolean;
 }) {
   /** タブの選択状態 */
@@ -91,8 +89,8 @@ export default function BooksClient({
       {/* Realtime購読ブリッジ（サーバからのBroadcastを受信し、handleRealtimeUpdateを呼ぶ） */}
       <RealtimeBridge onUpdate={handleRealtimeUpdate} />
 
-      {/* ヘッダー（検索・IPバッジ等） */}
-      <BooksHeader q={searchQuery} onSearchChange={setSearchQuery} classroom={classroom} />
+      {/* ヘッダー（検索など） */}
+      <BooksHeader q={searchQuery} onSearchChange={setSearchQuery} />
 
       <div className="flex-1 min-h-0 flex">
         {/* 左サイドバー（タブ切り替え） */}
