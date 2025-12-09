@@ -5,15 +5,42 @@ import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
-type UserCreatedEvent = { type: "user.created"; data: { id: string } };
-type ClerkEvent = { type: string; data?: unknown };
+// UserCreatedEventの型を定義
+type UserCreatedEvent = { 
+  type: "user.created";
+  data: {
+    id: string 
+  };
+};
 
+// Webhookが持っていそうな最低限の型を定義
+type ClerkEvent = {
+  type?: unknown;
+  data?: {
+    id?: unknown;
+  };
+};
+
+/**
+ * Webhookで飛んできたイベントが
+ * 「Clerkの user.created イベント」かどうかをチェックする関数
+ */
 function isUserCreatedEvent(evt: unknown): evt is UserCreatedEvent {
-  if (!evt || typeof evt !== "object") return false;
+  // まずはオブジェクトかどうか
+  if (!evt || typeof evt !== "object") {
+    return false;
+  }
+
+  // ClerkEvent として扱う
   const e = evt as ClerkEvent;
-  if (e.type !== "user.created") return false;
-  const d = (e as { data?: unknown }).data;
-  return !!d && typeof (d as { id?: unknown }).id === "string";
+
+  // type が "user.created" 以外なら対象外
+  if (e.type !== "user.created") {
+    return false;
+  }
+
+  // data.id が文字列ならOK
+  return typeof e.data?.id === "string";
 }
 
 export async function POST(req: Request) {
