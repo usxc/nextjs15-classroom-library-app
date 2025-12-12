@@ -38,13 +38,13 @@
 ### フロントエンド
 
 - 言語: TypeScript
-- フレームワーク: Next.js 15.5.7(App Router)
+- フレームワーク: Next.js 15.5.9(App Router)
 - スタイル: tailwind
 
 ### バックエンド
 
 - 言語: TypeScript
-- フレームワーク: Next.js 15.5.7(App Router)
+- フレームワーク: Next.js 15.5.9(App Router)
 - データベース: PostgreSQL(Supabase Database)
 - ORM: Prisma
 - 認証: Clerk
