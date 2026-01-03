@@ -11,7 +11,7 @@ const supabase = createClient(
 type LoanUpdate = Record<string, unknown>;
 
 export async function publishLoanEvent(payload: LoanUpdate) {
-  const ch = supabase.channel("library");
+  const ch = supabase.channel("library", { config: { private: true } });
   await ch.send({ type: "broadcast", event: "loan:update", payload });
   await supabase.removeChannel(ch);
 }
